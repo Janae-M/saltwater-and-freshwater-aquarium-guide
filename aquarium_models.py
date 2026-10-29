@@ -56,3 +56,40 @@ class Aquarium:
             decorations = list(data.get("decorations", [])),
             equipment = list(data.get("equipment", [])),
         )
+
+@dataclass
+class FreshwaterAquarium(Aquarium):
+    """sets the aquarium plan for freshwater fish and plants."""
+    aquarium_type = "freshwater"
+
+    def care_advice(self) -> str:
+        return "Treat tap water with an appropriate dechlorinator before adding fish."
+
+@dataclass
+class SaltwaterAquarium(Aquarium):
+    """sets the aquarium plan for saltwater fish and plants."""
+    aquarium_type = "saltwater"
+
+    def care_advice(self) -> str:
+        return (
+            "Monitor salinity carefully. Evaporation removes water but leaves salt; "
+            "follow appropriate aquarium guidance when replacing evaporated water."
+        )
+
+def create_aquarium(aquarium_type: str, tank_size: float, budget: float) -> Aquarium:
+    """validates inputs then creates an aquarium object."""
+    if tank_size <= 0:
+        raise ValueError("Tank size must be greater than zero.")
+    if budget <= 0:
+        raise ValueError("Budget must be greater than zero.")
+
+    aquarium_type = aquarium_type.lower().strip()
+    aquarium_class = {
+        "freshwater": FreshwaterAquarium,
+        "saltwater": SaltwaterAquarium,
+    }.get(aquarium_type)
+
+    if aquarium_class is None:
+        raise ValueError("Aquarium type must be 'freshwater' or 'saltwater'.")
+
+    return aquarium_class(tank_size = tank_size, budget = budget)

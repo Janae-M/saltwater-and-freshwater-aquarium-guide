@@ -41,7 +41,7 @@ def save_summary(aquarium: Aquarium, filename: str | Path = "aquarium_summary.tx
     """saves a human-readable summary of the aquarium plan to a text file."""
     path = Path(filename)
     lines = [
-        "YOUR AQUARIUM PLAN",
+        "\nYOUR AQUARIUM PLAN",
         f"Aquarium type: {aquarium.aquarium_type}",
         f"Tank size: {aquarium.tank_size:g} gallons",
         f"Budget: ${aquarium.budget:.2f}",

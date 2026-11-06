@@ -9,8 +9,16 @@ from aquarium_models import Aquarium, create_aquarium
 from aquarium_recommendations import find_fish, get_equipment, budget_status
 from user_storage import save_plan, save_summary
 
-def ask_aquarium_type(prompt: str) -> float:
+def ask_aquarium_type() -> str:
     """asks the user to select an aquarium type."""
+    while True:
+        choice = input("\nWould you like to create a freshwater or saltwater aquirium? ").strip().lower()
+        if choice in ("freshwater", "saltwater"):
+            return choice
+        print("Invalid input. Please enter 'freshwater' or 'saltwater'.")
+
+def ask_positive_number(prompt: str) -> float:
+    """asks the user to enter a positive number."""
     while True:
         try:
             number = float(input(prompt))
@@ -90,3 +98,40 @@ def display_plan(aquarium: Aquarium) -> None:
         print(care_advice())
     else:
         print("No specific care advice available.")
+
+def run() -> None:
+    """main function to run the aquarium guide."""
+    print("-" * 40)
+    print("WELCOME TO AQUARIUM GUIDE!")
+    print("-" * 40)
+
+    print("\nThis program will guide you through the process of setting up and maintaining a freshwater or " \
+    "saltwater aquarium, including selecting the right fish, plants, and equipment for your specific needs!")
+
+    aquarium_type = ask_aquarium_type()
+    tank_size = ask_positive_number("\nHow many gallons will tank contain? ")
+    budget = ask_positive_number("\nWhat is your budget for the aquarium in dollars? ")
+
+    aquarium = create_aquarium(aquarium_type, tank_size, budget)
+    plant_options = PLANTS[aquarium_type]
+    aquarium.decorations = choose_items(plant_options, "plants")
+
+    fish_options = find_fish(aquarium)
+    aquarium.fish = choose_items(fish_options, "fish") if fish_options else []
+    if not fish_options:
+        print("\nNo fish options are available for the tank size you selected.")
+
+    aquarium.equipment = get_equipment(aquarium_type)
+    display_plan(aquarium)
+
+    try:
+        save_plan(aquarium)
+        save_summary(aquarium)
+        print("\nYour aquarium plan has been saved to 'aquarium_plan.json' and 'aquarium_summary.txt'.")
+    except OSError as exc:
+        print(f"\nYour plan was displayed, but could not be saved: {exc}")
+
+    print("\nThank you for using the Aquarium Guide! Enjoy your new aquarium!")
+
+if __name__ == "__main__":
+    run()
